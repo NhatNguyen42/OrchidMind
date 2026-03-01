@@ -31,11 +31,10 @@ const PETAL_ANGLES = Array.from({ length: PETAL_COUNT }, (_, i) => (i / PETAL_CO
 /* ── Component ── */
 interface Props {
   note: Note;
-  position: NodePosition;
 }
 
-export function OrchidNode({ note, position }: Props) {
-  const { selectNote, hoverNote, hoveredNoteId, selectedNote, searchResults } = useGarden();
+export function OrchidNode({ note }: Props) {
+  const { selectNote, hoverNote, hoveredNoteId, selectedNote, searchResults, positions } = useGarden();
   const groupRef = useRef<THREE.Group>(null);
   const petalRefs = useRef<(THREE.Mesh | null)[]>([]);
   const lightRef = useRef<THREE.PointLight>(null);
@@ -54,11 +53,14 @@ export function OrchidNode({ note, position }: Props) {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
 
+    /* Read LIVE position from the shared ref (updated by force graph each frame) */
+    const pos = positions.current.get(note.id) ?? [0, 0, 0];
+
     /* Gentle floating motion */
     groupRef.current.position.set(
-      position[0],
-      position[1] + Math.sin(t * 0.5 + position[0]) * 0.15,
-      position[2]
+      pos[0],
+      pos[1] + Math.sin(t * 0.5 + pos[0]) * 0.15,
+      pos[2]
     );
 
     /* Scale spring */
@@ -83,7 +85,7 @@ export function OrchidNode({ note, position }: Props) {
   });
 
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef}>
       {/* Central orb */}
       <mesh
         onPointerEnter={(e) => { e.stopPropagation(); setLocalHover(true); hoverNote(note.id); }}
@@ -165,7 +167,6 @@ export function OrchidNode({ note, position }: Props) {
         maxWidth={3}
         outlineWidth={0.01}
         outlineColor="#000000"
-        font="/fonts/Inter-Medium.woff"
       >
         {note.title}
       </Text>

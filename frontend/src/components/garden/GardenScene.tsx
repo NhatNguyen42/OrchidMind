@@ -9,7 +9,6 @@ import { OrchidNode } from "./OrchidNode";
 import { VineConnection } from "./VineConnection";
 import { Particles } from "./Particles";
 import { CameraController } from "./CameraController";
-import type { NodePosition } from "@/lib/types";
 
 /* ── Inner scene (runs inside Canvas) ── */
 function SceneContent() {
@@ -26,10 +25,9 @@ function SceneContent() {
   return (
     <>
       {/* Nodes */}
-      {notes.map((note) => {
-        const pos = positions.current.get(note.id) ?? [0, 0, 0];
-        return <OrchidNode key={note.id} note={note} position={pos as NodePosition} />;
-      })}
+      {notes.map((note) => (
+        <OrchidNode key={note.id} note={note} />
+      ))}
 
       {/* Vines */}
       {connections.map((conn, i) => (
@@ -61,20 +59,19 @@ export function GardenScene() {
       <Suspense fallback={null}>
         <SceneContent />
         <Particles />
+        {/* Post-processing (inside Suspense so failures don't kill the scene) */}
+        <EffectComposer>
+          <Bloom
+            intensity={1.4}
+            luminanceThreshold={0.15}
+            luminanceSmoothing={0.9}
+            mipmapBlur
+          />
+          <Vignette darkness={0.45} offset={0.4} />
+        </EffectComposer>
       </Suspense>
 
       <CameraController />
-
-      {/* Post-processing */}
-      <EffectComposer>
-        <Bloom
-          intensity={1.4}
-          luminanceThreshold={0.15}
-          luminanceSmoothing={0.9}
-          mipmapBlur
-        />
-        <Vignette darkness={0.45} offset={0.4} />
-      </EffectComposer>
     </Canvas>
   );
 }
