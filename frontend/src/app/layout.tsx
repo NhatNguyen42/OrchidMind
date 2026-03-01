@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "OrchidMind — Knowledge Garden",
   description: "A living 3D knowledge garden where ideas bloom as orchids and AI discovers connections between them.",
+  authors: [{ name: "Nhat Nguyen", url: "mailto:nhatmn114@gmail.com" }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

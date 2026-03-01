@@ -30,10 +30,10 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Toggle button */}
+      {/* Toggle button — bottom-left so it doesn't block the 3D scene */}
       <button
         onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 w-9 h-9 rounded-xl flex items-center justify-center
+        className="fixed bottom-5 left-4 z-50 w-9 h-9 rounded-xl flex items-center justify-center
           border border-white/10 text-white/70 hover:text-white hover:border-white/20 transition-all"
         style={{ background: "rgba(3,7,18,0.6)", backdropFilter: "blur(12px)" }}
       >
@@ -132,10 +132,16 @@ export function Sidebar() {
               )}
             </div>
 
-            {/* Footer stats */}
+            {/* Footer stats + author */}
             <div className="px-5 py-3 border-t border-white/[0.06]">
               <p className="text-[10px] text-slate-500">
                 {notes.length} notes · {searchResults.length > 0 ? `${searchResults.length} matches` : "All visible"}
+              </p>
+              <p className="text-[9px] text-slate-600 mt-1.5">
+                Built by{" "}
+                <a href="mailto:nhatmn114@gmail.com" className="text-teal-500/70 hover:text-teal-400 transition-colors">
+                  Nhat Nguyen
+                </a>
               </p>
             </div>
           </motion.aside>
