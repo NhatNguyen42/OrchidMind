@@ -28,8 +28,6 @@ interface GardenCtx {
   toggleSidebar: () => void;
   toggleEditor: () => void;
   graphRef: React.MutableRefObject<ForceGraph | null>;
-  cameraTarget: NodePosition | null;
-  setCameraTarget: (t: NodePosition | null) => void;
 }
 
 const Ctx = createContext<GardenCtx | null>(null);
@@ -51,7 +49,6 @@ export function GardenProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [cameraTarget, setCameraTarget] = useState<NodePosition | null>(null);
 
   const graphRef = useRef<ForceGraph | null>(null);
   const positions = useRef<Map<string, NodePosition>>(new Map());
@@ -87,10 +84,6 @@ export function GardenProvider({ children }: { children: React.ReactNode }) {
   const selectNote = useCallback((note: Note | null) => {
     setSelected(note);
     setInsights(null);
-    if (note) {
-      const pos = positions.current.get(note.id);
-      if (pos) setCameraTarget(pos);
-    }
   }, []);
 
   const hoverNote = useCallback((id: string | null) => setHovered(id), []);
@@ -103,9 +96,9 @@ export function GardenProvider({ children }: { children: React.ReactNode }) {
     try {
       const results = await searchNotes(q);
       setSearchResults(results.map((n) => n.id));
+      /* Select the top result so the camera auto-tracks it */
       if (results.length > 0) {
-        const pos = positions.current.get(results[0].id);
-        if (pos) setCameraTarget(pos);
+        setSelected(results[0]);
       }
     } catch {
       setSearchResults([]);
@@ -154,7 +147,6 @@ export function GardenProvider({ children }: { children: React.ReactNode }) {
         toggleSidebar: () => setSidebarOpen((p) => !p),
         toggleEditor: () => setEditorOpen((p) => !p),
         graphRef,
-        cameraTarget, setCameraTarget,
       }}
     >
       {children}

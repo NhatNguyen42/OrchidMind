@@ -7,23 +7,24 @@ import * as THREE from "three";
 import { useGarden } from "@/components/providers/GardenProvider";
 
 export function CameraController() {
-  const { cameraTarget, setCameraTarget } = useGarden();
+  const { selectedNote, positions } = useGarden();
   const controlsRef = useRef<any>(null);
   const { camera } = useThree();
 
   useFrame(() => {
-    if (!cameraTarget || !controlsRef.current) return;
+    if (!controlsRef.current) return;
 
-    const target = new THREE.Vector3(...cameraTarget);
-    const cameraOffset = target.clone().add(new THREE.Vector3(2, 1.5, 4));
+    /* Continuously track selected note's LIVE position */
+    if (selectedNote) {
+      const livePos = positions.current.get(selectedNote.id);
+      if (livePos) {
+        const target = new THREE.Vector3(...livePos);
+        const offset = target.clone().add(new THREE.Vector3(1.5, 1.0, 3.5));
 
-    camera.position.lerp(cameraOffset, 0.03);
-    controlsRef.current.target.lerp(target, 0.03);
-    controlsRef.current.update();
-
-    /* Stop tracking once close enough */
-    if (camera.position.distanceTo(cameraOffset) < 0.1) {
-      setCameraTarget(null);
+        camera.position.lerp(offset, 0.04);
+        controlsRef.current.target.lerp(target, 0.04);
+        controlsRef.current.update();
+      }
     }
   });
 
@@ -34,7 +35,7 @@ export function CameraController() {
       dampingFactor={0.05}
       minDistance={3}
       maxDistance={40}
-      autoRotate
+      autoRotate={!selectedNote}
       autoRotateSpeed={0.15}
     />
   );
